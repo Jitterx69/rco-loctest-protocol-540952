@@ -47,3 +47,11 @@ harness = false
 [[bench]]
 name = "shard_scaling"
 harness = false
+
+[[bench]]
+name = "final_audit"
+harness = false
+
+[[bench]]
+name = "meta_alignment"
+harness = false

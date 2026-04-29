@@ -7,6 +7,7 @@ use rco_reflexive::jacobian::ReflexiveJacobian;
 use crate::rfc::RecursiveFeedbackController;
 use crate::damper::ActiveResonantDamper;
 use crate::lee::LatentEmulationEngine;
+use crate::mrl::MetaReflexiveLoop;
 
 /// Represents the Lasing Controller.
 pub struct LasingController {
@@ -32,6 +33,10 @@ pub struct LasingController {
     pub global_slashing: f64,
     /// Latent Emulation Engine (Phase-VI)
     pub lee: LatentEmulationEngine,
+    /// Meta-Reflexive Loop (Phase-VII)
+    pub mrl: MetaReflexiveLoop,
+    /// Omega Point achieved?
+    pub omega_achieved: bool,
 }
 
 impl LasingController {
@@ -49,6 +54,8 @@ impl LasingController {
             ard: ActiveResonantDamper::new(),
             global_slashing: 1.0,
             lee: LatentEmulationEngine::new(obs_dim),
+            mrl: MetaReflexiveLoop::new(),
+            omega_achieved: false,
         }
     }
 
@@ -103,6 +110,18 @@ impl LasingController {
             // For stationary shards, beta=0, eta=eta0.
             let lorentz_factor = 1.0; // Simplified for local cluster
             force += synthetic * lorentz_factor;
+        }
+
+        // 9. Meta-Reflexive Stabilization (Phase-VII)
+        // Adjusts the entire force vector based on the manifold's own stability laws.
+        let velocity_norm = force.norm();
+        let ricci_flux = 0.001; // Simulated Ricci Flux
+        let meta_gain = self.mrl.stabilize_gain(1.0, ricci_flux, velocity_norm);
+        force *= meta_gain;
+
+        // 10. Omega Point Detection
+        if force.norm() < 1e-12 {
+            self.omega_achieved = true;
         }
 
         force

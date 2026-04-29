@@ -13,3 +13,4 @@ pub mod attestation;
 pub mod routing;
 pub mod oracle;
 pub mod handshake;
+pub mod dgq;
