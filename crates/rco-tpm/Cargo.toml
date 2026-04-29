@@ -1,0 +1,15 @@
+[package]
+name = "rco-tpm"
+description = "RCO Protocol — TPM 2.0 Simulator and PCR Pinning"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-crypto = { workspace = true }
+rco-types = { workspace = true }
+sha2 = "0.10"
+
+[dev-dependencies]
+rand = "0.8"

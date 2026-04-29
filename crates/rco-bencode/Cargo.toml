@@ -1,0 +1,22 @@
+[package]
+name = "rco-bencode"
+description = "RCO Protocol — Canonical Bencode serialization engine with arena allocation"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = []
+std = ["rco-types/std"]
+
+[dependencies]
+rco-types = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "encode_throughput"
+harness = false

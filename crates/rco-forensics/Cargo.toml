@@ -1,0 +1,11 @@
+[package]
+name = "rco-forensics"
+description = "RCO Protocol — Topological Data Analysis and Audit SDK"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-types = { workspace = true }
+rco-quorum = { workspace = true }

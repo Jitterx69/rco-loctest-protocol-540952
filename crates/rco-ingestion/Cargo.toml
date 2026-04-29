@@ -1,0 +1,25 @@
+[package]
+name = "rco-ingestion"
+description = "RCO Protocol — Atomic Two-Phase Commit ingestion gateway with WAL persistence"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = ["std"]
+std = ["rco-types/std"]
+
+[dependencies]
+rco-types = { workspace = true }
+rco-merkle = { workspace = true }
+rco-bencode = { workspace = true }
+sha3 = { workspace = true }
+rco-crypto = { workspace = true }
+rco-quorum = { workspace = true }
+rco-hpb = { workspace = true }
+rco-pq = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = "3.15"

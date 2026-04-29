@@ -1,0 +1,25 @@
+[package]
+name = "rco-sdk-julia"
+description = "RCO Protocol — C-ABI FFI bridge for Julia simulation SDKs"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["std"]
+std = ["rco-types/std"]
+
+[dependencies]
+rco-types = { workspace = true }
+rco-p14 = { workspace = true }
+rco-bencode = { workspace = true }
+rco-merkle = { workspace = true }
+rco-ingestion = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }

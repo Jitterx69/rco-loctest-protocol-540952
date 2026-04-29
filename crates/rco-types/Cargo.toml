@@ -1,0 +1,14 @@
+[package]
+name = "rco-types"
+description = "RCO Protocol — Shared type definitions, error taxonomy, and batch structures"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = []
+std = []
+
+[dependencies]
+zeroize = { workspace = true }

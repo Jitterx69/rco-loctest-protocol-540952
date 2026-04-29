@@ -1,0 +1,19 @@
+[package]
+name = "rco-quorum"
+description = "RCO Protocol — Consensus and Gossip Engine"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-crypto = { workspace = true }
+rco-types = { workspace = true }
+sha2 = "0.10"
+rand = "0.8"
+bls12_381 = "0.8"
+group = "0.13"
+cuckoofilter = "0.5" # For gossip deduplication
+
+[dev-dependencies]
+tempfile = "3.15"

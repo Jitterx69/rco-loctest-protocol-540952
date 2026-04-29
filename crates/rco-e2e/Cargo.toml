@@ -1,0 +1,24 @@
+[package]
+name = "rco-e2e"
+description = "RCO Protocol — End-to-end integration benchmarks and system validation"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-types = { workspace = true }
+rco-p14 = { workspace = true }
+rco-bencode = { workspace = true }
+rco-merkle = { workspace = true }
+rco-ingestion = { workspace = true }
+rco-audit = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+tempfile = { workspace = true }
+rand = "0.8"
+
+[[bench]]
+name = "integration_pipeline"
+harness = false

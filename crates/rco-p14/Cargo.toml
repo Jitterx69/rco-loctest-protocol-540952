@@ -1,0 +1,22 @@
+[package]
+name = "rco-p14"
+description = "RCO Protocol — Fixed-precision mantissa projection operator (P14: ℝ → ℤ₁₂₈)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = []
+std = ["rco-types/std"]
+
+[dependencies]
+rco-types = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "p14_throughput"
+harness = false

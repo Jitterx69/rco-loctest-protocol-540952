@@ -1,0 +1,24 @@
+[package]
+name = "rco-audit"
+description = "RCO Protocol — High-performance full-chain audit and integrity scanner"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-types = { workspace = true }
+rco-merkle = { workspace = true }
+rco-ingestion = { workspace = true }
+rco-bencode = { workspace = true }
+sha3 = { workspace = true, features = ["asm"] }
+rayon = "1.10" # For parallel audit sweeps
+memmap2 = "0.9"
+
+[[bench]]
+name = "audit_throughput"
+harness = false
+
+[dev-dependencies]
+criterion = { workspace = true }
+tempfile = { workspace = true }

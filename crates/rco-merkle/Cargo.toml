@@ -1,0 +1,24 @@
+[package]
+name = "rco-merkle"
+description = "RCO Protocol — Recursive Merkle-Lineage (RML) chain engine using Keccak-256"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = []
+std = ["rco-types/std"]
+
+[dependencies]
+rco-types = { workspace = true }
+sha3 = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+criterion = { workspace = true }
+rco-bencode = { workspace = true }
+
+[[bench]]
+name = "chain_throughput"
+harness = false
