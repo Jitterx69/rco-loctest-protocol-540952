@@ -4,6 +4,8 @@
 
 use nalgebra::{DMatrix, DVector};
 use rco_reflexive::jacobian::ReflexiveJacobian;
+use crate::rfc::RecursiveFeedbackController;
+use crate::damper::ActiveResonantDamper;
 
 /// Represents the Lasing Controller.
 pub struct LasingController {
@@ -21,6 +23,10 @@ pub struct LasingController {
     pub gain: f64,
     /// Reflexive Jacobian engine
     pub rj: ReflexiveJacobian,
+    /// Recursive Feedback Controller (Phase-IV)
+    pub rfc: RecursiveFeedbackController,
+    /// Active Resonant Damper (Phase-IV)
+    pub ard: ActiveResonantDamper,
 }
 
 impl LasingController {
@@ -28,16 +34,18 @@ impl LasingController {
     pub fn new(param_dim: usize, obs_dim: usize, lambda: f64, gain: f64) -> Self {
         Self {
             lambda,
-            ki: 0.01, // Default integral coefficient
-            kr: 0.05, // Default reflexive coefficient
+            ki: 0.01,
+            kr: 0.05,
             integral_error: 0.0,
             prev_drift: 0.0,
             gain,
             rj: ReflexiveJacobian::new(param_dim, obs_dim),
+            rfc: RecursiveFeedbackController::new(),
+            ard: ActiveResonantDamper::new(),
         }
     }
 
-    /// Computes the coherent force update using PID-Reflexive Loop.
+    /// Computes the coherent force update using PID-Reflexive Loop and ARD.
     pub fn compute_lasing_force(&mut self, epsilon: &DVector<f64>, jacobian: &DMatrix<f64>) -> DVector<f64> {
         let current_drift = epsilon.norm();
         
@@ -52,13 +60,44 @@ impl LasingController {
         let reflexive_comp = current_drift - self.prev_drift;
         self.prev_drift = current_drift;
 
-        // Total Optimization Force: F = -[lambda*P + ki*I + kr*R] * G * Gradient
-        let total_gain = (self.lambda + self.ki * self.integral_error + self.kr * reflexive_comp) * self.gain;
+        // 4. RFC: Hierarchical gain synchronization
+        let target_gain = self.rfc.synchronize_step(self.lambda, 0.99, current_drift);
         
-        // Level-1 Safety: Gain Clamp (TC-III-14 override)
+        // Total Optimization Force: F = -[target_gain*P + ki*I + kr*R] * G * Gradient
+        let total_gain = (target_gain + self.ki * self.integral_error + self.kr * reflexive_comp) * self.gain;
+        
+        // Level-1 Safety: Gain Clamp
         let clamped_gain = total_gain.clamp(0.0, 5.0);
 
-        -(gradient * clamped_gain)
+        let mut force = -(gradient * clamped_gain);
+
+        // 5. ARD: Mode 3.4 Harmonic Suppression
+        let echoes = self.ard.detect_echoes(&force);
+        let counter_pulse = self.ard.generate_counter_pulse(&echoes);
+        
+        // Apply counter-pulse if dimensions match (simplified)
+        if counter_pulse.len() == force.len() {
+            force += counter_pulse;
+        }
+
+        // 6. RMC: Riemannian Manifold Contraction
+        self.apply_rmc(&mut force, jacobian);
+
+        force
+    }
+
+    /// Riemannian Manifold Contraction (RMC): Neutralizes Gradient Black Holes.
+    /// Pulls vectors away from singularities where |g| -> 0.
+    fn apply_rmc(&self, force: &mut DVector<f64>, jacobian: &DMatrix<f64>) {
+        // Metric tensor g = J^T * J
+        let g = jacobian.transpose() * jacobian;
+        let det_g = g.determinant();
+
+        // If approaching singularity threshold (|g| < 1e-9)
+        if det_g.abs() < 1e-9 {
+            // Apply "Geometric Tension" - reverse the force direction to escape singularity
+            *force *= -0.5;
+        }
     }
 
     /// Dynamically adjusts the gain based on coherence.

@@ -5,6 +5,8 @@
 #![warn(missing_docs)]
 
 pub mod controller;
-pub mod thermo;
 pub mod sharding;
+pub mod thermo;
 pub mod spectral;
+pub mod rfc;
+pub mod damper;

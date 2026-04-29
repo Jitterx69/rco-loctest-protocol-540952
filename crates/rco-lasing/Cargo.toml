@@ -27,3 +27,11 @@ harness = false
 [[bench]]
 name = "spectral_efficiency"
 harness = false
+
+[[bench]]
+name = "loop_stability"
+harness = false
+
+[[bench]]
+name = "resonant_damping"
+harness = false
