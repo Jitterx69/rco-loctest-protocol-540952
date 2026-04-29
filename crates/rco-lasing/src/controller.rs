@@ -8,6 +8,10 @@ use crate::rfc::RecursiveFeedbackController;
 use crate::damper::ActiveResonantDamper;
 use crate::lee::LatentEmulationEngine;
 use crate::mrl::MetaReflexiveLoop;
+use crate::quantum::QuantumBoundJitterController;
+use crate::fusion::LorentzInvariantFusion;
+use crate::recursive::HyperRecursiveFinality;
+use crate::evolution::AutonomousManifoldEvolution;
 
 /// Represents the Lasing Controller.
 pub struct LasingController {
@@ -35,6 +39,14 @@ pub struct LasingController {
     pub lee: LatentEmulationEngine,
     /// Meta-Reflexive Loop (Phase-VII)
     pub mrl: MetaReflexiveLoop,
+    /// Quantum Jitter Control (Stage-III Phase-I)
+    pub quantum: QuantumBoundJitterController,
+    /// Lorentz-Invariant Fusion (Stage-III Phase-II)
+    pub fusion: LorentzInvariantFusion,
+    /// Hyper-Recursive Finality (Stage-III Phase-III)
+    pub recursive: HyperRecursiveFinality,
+    /// Autonomous Evolution (Stage-IV Phase-I)
+    pub evolution: AutonomousManifoldEvolution,
     /// Omega Point achieved?
     pub omega_achieved: bool,
 }
@@ -55,6 +67,10 @@ impl LasingController {
             global_slashing: 1.0,
             lee: LatentEmulationEngine::new(obs_dim),
             mrl: MetaReflexiveLoop::new(),
+            quantum: QuantumBoundJitterController::new(),
+            fusion: LorentzInvariantFusion::new(),
+            recursive: HyperRecursiveFinality::new(),
+            evolution: AutonomousManifoldEvolution::new(),
             omega_achieved: false,
         }
     }
@@ -119,7 +135,27 @@ impl LasingController {
         let meta_gain = self.mrl.stabilize_gain(1.0, ricci_flux, velocity_norm);
         force *= meta_gain;
 
-        // 10. Omega Point Detection
+        // 10. Quantum-Bound Jitter Adjustment (Phase-I Stage-III)
+        let heisenberg_gain = self.quantum.compute_heisenberg_gain(1.0, epsilon.norm());
+        force *= heisenberg_gain;
+
+        // 11. Relativistic Synchronicity Gain (Phase-II Stage-III)
+        // Adjust gain based on logical velocity (simulated as current force magnitude)
+        let logical_v = (force.norm() / self.lambda).min(0.9);
+        let relativistic_gamma = self.fusion.compute_gamma(logical_v);
+        force *= relativistic_gamma;
+
+        // 12. Self-Verification Gain (Phase-III Stage-III)
+        // If the recursive proof depth is high, we can increase gain confidence.
+        let proof_confidence = 1.0 + (self.recursive.proof_depth as f64 / 1_000_000.0).min(0.5);
+        force *= proof_confidence;
+
+        // 13. Autonomous Evolutionary Gain (Phase-I Stage-IV)
+        // Evaluate fitness based on force norm (entropy proxy)
+        let fitness = self.evolution.evaluate_fitness(force.norm());
+        self.lambda = self.evolution.adapt_gain(self.lambda);
+
+        // 14. Omega Point Detection
         if force.norm() < 1e-12 {
             self.omega_achieved = true;
         }

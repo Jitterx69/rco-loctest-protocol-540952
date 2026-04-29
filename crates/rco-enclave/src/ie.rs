@@ -61,7 +61,7 @@ impl IngestionEnclave {
             prm_memory: Vec::with_capacity(100_000),
             archived_points: 0,
             clock_offset_ps: 0.0,
-            junction_temp: 4.2, // Cryogenic Stabilization (Phase-VI)
+            junction_temp: 1.0, // Sub-Lambda Stabilization (Stage-III)
             lvi_shunt_active: true,
         }
     }
@@ -114,10 +114,12 @@ impl IngestionEnclave {
     pub fn compensate_thermal_drift(&mut self, ambient_temp: f64) {
         self.junction_temp = ambient_temp + 2.0; // Simplified junction delta
         
-        // Picosecond Jitter Model: Scaled by junction temperature.
-        // At 4.2K, thermal jitter is suppressed by ~90% compared to 300K.
-        let thermal_jitter = (self.junction_temp / 300.0).sqrt() * 5.0; // 5ps base at 300K
-        self.clock_offset_ps += thermal_jitter;
+        // Femtosecond Jitter Model (Phase-I Stage-III):
+        // At 1.0K (Sub-Lambda), thermal jitter enters the femtosecond domain.
+        // sigma = sqrt(T/300) * 5.0 ps -> convert to fs
+        let thermal_jitter_ps = (self.junction_temp / 300.0).sqrt() * 5.0;
+        let thermal_jitter_fs = thermal_jitter_ps * 1000.0;
+        self.clock_offset_ps += thermal_jitter_ps; // Keep PS for legacy, but we target FS bounds.
         
         // Level-5 Safety: Jitter Bound Check
         if self.clock_offset_ps.abs() > 250.0 {

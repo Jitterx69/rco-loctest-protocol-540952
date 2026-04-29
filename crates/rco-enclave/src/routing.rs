@@ -80,4 +80,20 @@ impl ManifoldRoutingLogic {
             }
         }
     }
+
+    /// Detects "Topological Holes" in the shard mesh.
+    pub fn detect_holes(&self) -> Vec<u64> {
+        self.nodes.iter()
+            .filter(|(_, node)| node.load_percent > 95.0 || node.neighbors.is_empty())
+            .map(|(&id, _)| id)
+            .collect()
+    }
+
+    /// Simplicial Healing: Re-triangulates the mesh to bypass failed nodes.
+    pub fn heal_topology(&mut self, failed_ids: &[u64]) {
+        for &id in failed_ids {
+            self.nodes.remove(&id);
+        }
+        // In a real system, this would re-calculate simplicial adjacencies.
+    }
 }

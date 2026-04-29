@@ -1353,9 +1353,11 @@ dependencies = [
  "criterion",
  "nalgebra",
  "rand 0.8.6",
+ "rco-enclave",
  "rco-reflexive",
  "rco-types",
  "serde",
+ "sha3",
 ]
 
 [[package]]

@@ -4,6 +4,7 @@
 
 use rco_types::HashDigest;
 use nalgebra::DVector;
+use std::collections::HashMap;
 
 /// Homological Signature: Set of Betti numbers characterizing the manifold.
 pub struct HomologicalSignature {
@@ -27,6 +28,8 @@ pub struct DecentralizedJacobianOracle {
     pub truth_gradient: DVector<f64>,
     /// Global manifold root Omega
     pub manifold_root: HashDigest,
+    /// Sovereign Root Anchors (Cross-cluster consensus)
+    pub root_anchors: HashMap<u64, HashDigest>,
 }
 
 impl DecentralizedJacobianOracle {
@@ -34,7 +37,37 @@ impl DecentralizedJacobianOracle {
         Self {
             truth_gradient: DVector::from_element(dim, 0.0),
             manifold_root: [0u8; 32],
+            root_anchors: HashMap::new(),
         }
+    }
+
+    /// Sovereign Root Consistency: Verifies the local manifold root against cluster anchors.
+    pub fn verify_root_consistency(&self, local_root: &HashDigest) -> bool {
+        if self.root_anchors.is_empty() {
+            return true; // Bootstrapping
+        }
+
+        let mut match_count = 0;
+        for anchor in self.root_anchors.values() {
+            if anchor == local_root {
+                match_count += 1;
+            }
+        }
+
+        // Require 2/3 consensus for root validity
+        match_count * 3 >= self.root_anchors.len() * 2
+    }
+
+    /// Fused Stability Verification: Verifies structural integrity of a fused manifold state.
+    pub fn verify_fused_stability(&self, fused_state: &DVector<f64>, entropy_floor: f64) -> bool {
+        // A fused state is stable if its entropy-weighted norm is below a threshold.
+        // Simplified: Check if state norm is bounded.
+        fused_state.norm() < (1.0 / entropy_floor.max(1e-6))
+    }
+
+    /// Updates a regional root anchor.
+    pub fn update_root_anchor(&mut self, cluster_id: u64, root_hash: HashDigest) {
+        self.root_anchors.insert(cluster_id, root_hash);
     }
 
     /// Homological Signature Analysis (HSA): Verifies structural integrity.

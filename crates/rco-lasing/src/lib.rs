@@ -12,3 +12,7 @@ pub mod rfc;
 pub mod damper;
 pub mod lee;
 pub mod mrl;
+pub mod quantum;
+pub mod fusion;
+pub mod recursive;
+pub mod evolution;

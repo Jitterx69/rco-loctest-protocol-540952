@@ -1,8 +1,3 @@
-//! # Bencode Value Grammar
-//!
-//! Defines the AST (Abstract Syntax Tree) for the RCO-Bencode grammar `G_RCO`.
-//!
-//! ```bnf
 //! <element>    ::= <string> | <integer> | <list> | <dictionary>
 //! <string>     ::= <len> ":" <bytes>
 //! <integer>    ::= "i" <number> "e"
