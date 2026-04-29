@@ -39,3 +39,11 @@ harness = false
 [[bench]]
 name = "slashing_effectiveness"
 harness = false
+
+[[bench]]
+name = "planetary_sync"
+harness = false
+
+[[bench]]
+name = "shard_scaling"
+harness = false

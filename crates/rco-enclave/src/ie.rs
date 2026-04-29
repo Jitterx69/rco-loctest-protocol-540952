@@ -61,8 +61,8 @@ impl IngestionEnclave {
             prm_memory: Vec::with_capacity(100_000),
             archived_points: 0,
             clock_offset_ps: 0.0,
-            junction_temp: 42.0,
-            lvi_shunt_active: true, // Phase-V default
+            junction_temp: 4.2, // Cryogenic Stabilization (Phase-VI)
+            lvi_shunt_active: true,
         }
     }
 
@@ -114,9 +114,10 @@ impl IngestionEnclave {
     pub fn compensate_thermal_drift(&mut self, ambient_temp: f64) {
         self.junction_temp = ambient_temp + 2.0; // Simplified junction delta
         
-        // Kalman Filter Approximation: Adjust clock offset based on temp gradient
-        let drift_gradient = (self.junction_temp - 42.0) * 12.5; // 12.5ps per degree
-        self.clock_offset_ps = -drift_gradient; // Counter-drift adjustment
+        // Picosecond Jitter Model: Scaled by junction temperature.
+        // At 4.2K, thermal jitter is suppressed by ~90% compared to 300K.
+        let thermal_jitter = (self.junction_temp / 300.0).sqrt() * 5.0; // 5ps base at 300K
+        self.clock_offset_ps += thermal_jitter;
         
         // Level-5 Safety: Jitter Bound Check
         if self.clock_offset_ps.abs() > 250.0 {

@@ -6,6 +6,7 @@ use nalgebra::{DMatrix, DVector};
 use rco_reflexive::jacobian::ReflexiveJacobian;
 use crate::rfc::RecursiveFeedbackController;
 use crate::damper::ActiveResonantDamper;
+use crate::lee::LatentEmulationEngine;
 
 /// Represents the Lasing Controller.
 pub struct LasingController {
@@ -29,6 +30,8 @@ pub struct LasingController {
     pub ard: ActiveResonantDamper,
     /// Governance Slashing Multiplier (Global)
     pub global_slashing: f64,
+    /// Latent Emulation Engine (Phase-VI)
+    pub lee: LatentEmulationEngine,
 }
 
 impl LasingController {
@@ -45,6 +48,7 @@ impl LasingController {
             rfc: RecursiveFeedbackController::new(),
             ard: ActiveResonantDamper::new(),
             global_slashing: 1.0,
+            lee: LatentEmulationEngine::new(obs_dim),
         }
     }
 
@@ -87,8 +91,19 @@ impl LasingController {
         self.apply_rmc(&mut force, jacobian);
 
         // 7. Geometric Slashing: Physical signal dampening (Phase-V)
-        // Applies the slashing multiplier to mute divergent shards.
         force *= self.global_slashing;
+
+        // 8. Relativistic Path Correction (RPC) & LEE Integration (Phase-VI)
+        // If the gradient is delayed, use the synthetic gradient from the LEE.
+        // We simulate this by blending the prediction if the norm of epsilon is low (indicative of stale data).
+        if epsilon.norm() < 1e-6 {
+            let synthetic = self.lee.generate_synthetic_gradient();
+            // Lorentz-Invariant Gain Scheduling simulation:
+            // eta = eta0 * gamma * sqrt(1 - beta^2)
+            // For stationary shards, beta=0, eta=eta0.
+            let lorentz_factor = 1.0; // Simplified for local cluster
+            force += synthetic * lorentz_factor;
+        }
 
         force
     }
