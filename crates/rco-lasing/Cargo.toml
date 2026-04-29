@@ -19,3 +19,11 @@ criterion = { workspace = true }
 [[bench]]
 name = "lasing_throughput"
 harness = false
+
+[[bench]]
+name = "gain_optimization"
+harness = false
+
+[[bench]]
+name = "spectral_efficiency"
+harness = false

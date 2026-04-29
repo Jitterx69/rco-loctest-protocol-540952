@@ -7,3 +7,4 @@
 pub mod controller;
 pub mod thermo;
 pub mod sharding;
+pub mod spectral;

@@ -6,3 +6,4 @@
 
 pub mod constraints;
 pub mod proof;
+pub mod optimality;
