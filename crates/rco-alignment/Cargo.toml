@@ -1,0 +1,26 @@
+[package]
+name = "rco-alignment"
+description = "RCO Protocol — Topological Manifold Alignment (TMA) and Active Lasering"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-types = { workspace = true }
+rco-forensics = { workspace = true }
+nalgebra = "0.32"
+rayon = "1.8"
+rand = "0.8"
+
+[dev-dependencies]
+tempfile = "3.15"
+criterion = { workspace = true }
+
+[[bench]]
+name = "tml_coherence"
+harness = false
+
+[[bench]]
+name = "tml_gradient"
+harness = false

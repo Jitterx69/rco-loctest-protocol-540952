@@ -16,6 +16,8 @@ members = [
     "crates/rco-forensics",
     "crates/rco-hpb",
     "crates/rco-pq",
+    "crates/rco-alignment",
+    "crates/rco-enclave",
 ]
 
 [workspace.package]
@@ -51,6 +53,9 @@ rco-tpm = { path = "crates/rco-tpm" }
 rco-quorum = { path = "crates/rco-quorum" }
 rco-hpb = { path = "crates/rco-hpb" }
 rco-pq = { path = "crates/rco-pq" }
+rco-alignment = { path = "crates/rco-alignment" }
+rco-forensics = { path = "crates/rco-forensics" }
+rco-enclave = { path = "crates/rco-enclave" }
 tempfile = "3.15"
 
 [profile.release]

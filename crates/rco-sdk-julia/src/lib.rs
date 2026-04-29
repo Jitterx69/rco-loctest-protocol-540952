@@ -45,6 +45,7 @@ pub mod p14_ffi;
 pub mod bencode_ffi;
 pub mod chain_ffi;
 pub mod ingestion_ffi;
+pub mod alignment_ffi;
 pub mod error_codes;
 
 // Re-export for Rust-side tests
