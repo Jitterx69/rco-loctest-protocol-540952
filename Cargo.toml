@@ -19,6 +19,7 @@ members = [
     "crates/rco-alignment",
     "crates/rco-enclave",
     "crates/rco-consensus",
+    "crates/rco-synthesis",
 ]
 
 [workspace.package]

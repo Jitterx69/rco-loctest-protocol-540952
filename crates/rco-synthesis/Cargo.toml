@@ -1,0 +1,21 @@
+[package]
+name = "rco-synthesis"
+description = "RCO Protocol — Stage-I Final Synthesis & Audit"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-types = { workspace = true }
+rco-crypto = { workspace = true }
+rco-merkle = { workspace = true }
+rco-alignment = { workspace = true }
+rco-enclave = { workspace = true }
+rco-consensus = { workspace = true }
+sha3 = "0.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[dev-dependencies]
+tempfile = "3.15"

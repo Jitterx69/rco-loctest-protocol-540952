@@ -1169,6 +1169,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rco-synthesis"
+version = "0.1.0"
+dependencies = [
+ "rco-alignment",
+ "rco-consensus",
+ "rco-crypto",
+ "rco-enclave",
+ "rco-merkle",
+ "rco-types",
+ "serde",
+ "serde_json",
+ "sha3",
+ "tempfile",
+]
+
+[[package]]
 name = "rco-tpm"
 version = "0.1.0"
 dependencies = [
