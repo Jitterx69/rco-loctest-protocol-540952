@@ -53,6 +53,8 @@ pub struct IngestionEnclave {
 pub struct RootOfTrustEnclave {
     pub manifold_root: HashDigest,
     pub approved_mrenclave: HashDigest,
+    /// Physical Temperature (K) — Phase-II Stage-IV
+    pub thermal_telemetry_k: f64,
 }
 
 impl IngestionEnclave {
@@ -134,7 +136,13 @@ impl RootOfTrustEnclave {
         Self {
             manifold_root: [0u8; 32],
             approved_mrenclave,
+            thermal_telemetry_k: 1.0, // Base superfluid temperature
         }
+    }
+
+    /// Thermal Limit Guard: Throttles ingestion if hardware heat is too high.
+    pub fn thermal_limit_guard(&self) -> bool {
+        self.thermal_telemetry_k < 4.5 // Superfluid transition threshold
     }
 
     /// Verifies an attestation quote from an Ingestion Enclave.

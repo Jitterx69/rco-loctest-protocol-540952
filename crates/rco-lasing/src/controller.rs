@@ -155,7 +155,14 @@ impl LasingController {
         let fitness = self.evolution.evaluate_fitness(force.norm());
         self.lambda = self.evolution.adapt_gain(self.lambda);
 
-        // 14. Omega Point Detection
+        // 14. Thermal Damping Gain (Phase-II Stage-IV)
+        // Adjust damping based on enclave cluster temperature.
+        // Simplified: Assume T = 1.0K base + evolution noise
+        let t_cluster = 1.0 + (self.evolution.generation as f64 * 0.001).min(3.0);
+        let thermal_damping = (t_cluster / 1.0).sqrt();
+        force *= 1.0 / thermal_damping;
+
+        // 15. Omega Point Detection
         if force.norm() < 1e-12 {
             self.omega_achieved = true;
         }

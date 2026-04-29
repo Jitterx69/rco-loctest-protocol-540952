@@ -89,3 +89,11 @@ harness = false
 [[bench]]
 name = "self_repair"
 harness = false
+
+[[bench]]
+name = "hardware_synthesis"
+harness = false
+
+[[bench]]
+name = "thermal_stability"
+harness = false
