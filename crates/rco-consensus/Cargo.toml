@@ -1,0 +1,27 @@
+[package]
+name = "rco-consensus"
+description = "RCO Protocol — Multi-Agent Consensus Geometry"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-types = { workspace = true }
+rco-crypto = { workspace = true }
+rco-alignment = { workspace = true }
+rco-enclave = { workspace = true }
+nalgebra = "0.32"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3.15"
+criterion = { workspace = true }
+
+[[bench]]
+name = "consensus_drift"
+harness = false
+
+[[bench]]
+name = "consensus_latency"
+harness = false

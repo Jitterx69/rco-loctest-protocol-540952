@@ -18,6 +18,7 @@ members = [
     "crates/rco-pq",
     "crates/rco-alignment",
     "crates/rco-enclave",
+    "crates/rco-consensus",
 ]
 
 [workspace.package]
@@ -56,6 +57,7 @@ rco-pq = { path = "crates/rco-pq" }
 rco-alignment = { path = "crates/rco-alignment" }
 rco-forensics = { path = "crates/rco-forensics" }
 rco-enclave = { path = "crates/rco-enclave" }
+rco-consensus = { path = "crates/rco-consensus" }
 tempfile = "3.15"
 
 [profile.release]

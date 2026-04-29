@@ -1006,6 +1006,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "rco-consensus"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "nalgebra",
+ "rco-alignment",
+ "rco-crypto",
+ "rco-enclave",
+ "rco-types",
+ "serde",
+ "tempfile",
+]
+
+[[package]]
 name = "rco-crypto"
 version = "0.1.0"
 dependencies = [
