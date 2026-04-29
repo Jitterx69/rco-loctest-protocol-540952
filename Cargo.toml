@@ -20,6 +20,8 @@ members = [
     "crates/rco-enclave",
     "crates/rco-consensus",
     "crates/rco-synthesis",
+    "crates/rco-threshold",
+    "crates/rco-reflexive",
 ]
 
 [workspace.package]

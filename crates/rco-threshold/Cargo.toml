@@ -1,0 +1,23 @@
+[package]
+name = "rco-threshold"
+description = "RCO Protocol — Distributed Threshold Sovereignty"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+rco-types = { workspace = true }
+rco-crypto = { workspace = true }
+bls12_381 = "0.8"
+group = "0.13"
+ff = "0.13"
+rand = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "threshold_finality"
+harness = false

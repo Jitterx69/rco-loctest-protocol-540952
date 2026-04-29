@@ -1156,6 +1156,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rco-reflexive"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "nalgebra",
+ "rco-consensus",
+ "rco-types",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "rco-sdk-julia"
 version = "0.1.0"
 dependencies = [
@@ -1182,6 +1194,20 @@ dependencies = [
  "serde_json",
  "sha3",
  "tempfile",
+]
+
+[[package]]
+name = "rco-threshold"
+version = "0.1.0"
+dependencies = [
+ "bls12_381",
+ "criterion",
+ "ff",
+ "group",
+ "rand 0.8.6",
+ "rco-crypto",
+ "rco-types",
+ "serde",
 ]
 
 [[package]]
