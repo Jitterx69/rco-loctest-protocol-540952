@@ -7,7 +7,23 @@
 use rco_types::HashDigest;
 
 /// Maximum PRM memory size (128 MB)
+/// Maximum PRM memory size (128 MB)
 const PRM_SIZE_LIMIT: usize = 128 * 1024 * 1024;
+
+/// Hardware-bound Attestation Quote.
+#[derive(Clone, Copy)]
+pub struct AttestationQuote {
+    pub mrenclave: HashDigest,
+    pub mrsigner: HashDigest,
+    pub report_data: HashDigest,
+}
+
+impl AttestationQuote {
+    pub fn verify(&self, expected_mrenclave: &HashDigest) -> bool {
+        // In a real system, this checks the Intel/AMD vendor signature
+        self.mrenclave == *expected_mrenclave
+    }
+}
 
 /// Simulates a lightweight telemetry point stored in the IE.
 #[derive(Clone, Copy)]
@@ -28,6 +44,15 @@ pub struct IngestionEnclave {
     pub clock_offset_ps: f64,
     /// Junction Temperature (Celsius)
     pub junction_temp: f64,
+    /// LVI-Resistant Shunt active?
+    pub lvi_shunt_active: bool,
+}
+
+/// Root-of-Trust Enclave (RTE).
+/// Hardened environment that manages the manifold root and governance rules.
+pub struct RootOfTrustEnclave {
+    pub manifold_root: HashDigest,
+    pub approved_mrenclave: HashDigest,
 }
 
 impl IngestionEnclave {
@@ -36,7 +61,17 @@ impl IngestionEnclave {
             prm_memory: Vec::with_capacity(100_000),
             archived_points: 0,
             clock_offset_ps: 0.0,
-            junction_temp: 42.0, // Default stable junction temp
+            junction_temp: 42.0,
+            lvi_shunt_active: true, // Phase-V default
+        }
+    }
+
+    /// LVI-Resistant Memory Shunt: Direct-to-Enclave DMA simulation.
+    pub fn dma_telemetry_bypass(&mut self, points: Vec<IEPoint>) {
+        if self.lvi_shunt_active {
+            for point in points {
+                self.ingest_step(point);
+            }
         }
     }
 
@@ -88,6 +123,27 @@ impl IngestionEnclave {
             // Trigger Emergency Cooling (Appendix CQ)
             self.clock_offset_ps = self.clock_offset_ps.clamp(-250.0, 250.0);
         }
+    }
+}
+
+impl RootOfTrustEnclave {
+    pub fn new(approved_mrenclave: HashDigest) -> Self {
+        Self {
+            manifold_root: [0u8; 32],
+            approved_mrenclave,
+        }
+    }
+
+    /// Verifies an attestation quote from an Ingestion Enclave.
+    pub fn verify_ie_attestation(&self, quote: &AttestationQuote) -> bool {
+        quote.verify(&self.approved_mrenclave)
+    }
+
+    /// Signs a manifold checkpoint for global coordination.
+    pub fn sign_checkpoint(&mut self, root: HashDigest) -> HashDigest {
+        self.manifold_root = root;
+        // In reality, this would use a hardware-protected private key
+        root
     }
 }
 

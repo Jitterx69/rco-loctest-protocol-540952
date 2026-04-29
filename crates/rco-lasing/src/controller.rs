@@ -27,6 +27,8 @@ pub struct LasingController {
     pub rfc: RecursiveFeedbackController,
     /// Active Resonant Damper (Phase-IV)
     pub ard: ActiveResonantDamper,
+    /// Governance Slashing Multiplier (Global)
+    pub global_slashing: f64,
 }
 
 impl LasingController {
@@ -42,6 +44,7 @@ impl LasingController {
             rj: ReflexiveJacobian::new(param_dim, obs_dim),
             rfc: RecursiveFeedbackController::new(),
             ard: ActiveResonantDamper::new(),
+            global_slashing: 1.0,
         }
     }
 
@@ -82,6 +85,10 @@ impl LasingController {
 
         // 6. RMC: Riemannian Manifold Contraction
         self.apply_rmc(&mut force, jacobian);
+
+        // 7. Geometric Slashing: Physical signal dampening (Phase-V)
+        // Applies the slashing multiplier to mute divergent shards.
+        force *= self.global_slashing;
 
         force
     }

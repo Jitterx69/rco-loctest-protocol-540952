@@ -22,6 +22,12 @@ pub struct ManifoldShard {
     pub ref_freq: f64,
     /// Current internal phase
     pub phase: f64,
+    /// Manifold Weight (Governance influence)
+    pub manifold_weight: f64,
+    /// Slashing Multiplier (0.0 = Muted, 1.0 = Full)
+    pub slashing_multiplier: f64,
+    /// Simplicial Entropy (Noise level)
+    pub entropy: f64,
 }
 
 impl ManifoldShard {
@@ -32,6 +38,9 @@ impl ManifoldShard {
             quorum_type,
             ref_freq: 1.0,
             phase: 0.0,
+            manifold_weight: 1.0,
+            slashing_multiplier: 1.0,
+            entropy: 0.0,
         }
     }
 

@@ -9,7 +9,7 @@ license.workspace = true
 [dependencies]
 rco-types = { workspace = true }
 rco-reflexive = { workspace = true }
-nalgebra = "0.32"
+nalgebra = { workspace = true }
 serde = { version = "1.0", features = ["derive"] }
 rand = "0.8"
 
@@ -34,4 +34,8 @@ harness = false
 
 [[bench]]
 name = "resonant_damping"
+harness = false
+
+[[bench]]
+name = "slashing_effectiveness"
 harness = false
