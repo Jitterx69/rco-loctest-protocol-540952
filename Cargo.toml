@@ -22,6 +22,8 @@ members = [
     "crates/rco-synthesis",
     "crates/rco-threshold",
     "crates/rco-reflexive",
+    "crates/rco-lasing",
+    "crates/rco-zkmv",
 ]
 
 [workspace.package]
@@ -61,6 +63,11 @@ rco-alignment = { path = "crates/rco-alignment" }
 rco-forensics = { path = "crates/rco-forensics" }
 rco-enclave = { path = "crates/rco-enclave" }
 rco-consensus = { path = "crates/rco-consensus" }
+rco-synthesis = { path = "crates/rco-synthesis" }
+rco-threshold = { path = "crates/rco-threshold" }
+rco-reflexive = { path = "crates/rco-reflexive" }
+rco-lasing = { path = "crates/rco-lasing" }
+rco-zkmv = { path = "crates/rco-zkmv" }
 tempfile = "3.15"
 
 [profile.release]
