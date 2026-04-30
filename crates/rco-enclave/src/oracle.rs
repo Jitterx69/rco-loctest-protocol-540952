@@ -89,4 +89,15 @@ impl DecentralizedJacobianOracle {
         
         self.truth_gradient = aggregated;
     }
+
+    /// Meta-Stability Oracle (Phase-III Stage-IV).
+    /// Verifies that the manifold evolutionary path is within stable regimes.
+    pub fn verify_meta_stability(&self, variance: f64) -> bool {
+        variance < 0.05 // Level-5 Meta-Stability threshold
+    }
+
+    /// Curvature Bound Check: Ensures geometry doesn't exceed safe limits.
+    pub fn check_curvature_bounds(&self, curvature: f64) -> bool {
+        curvature.abs() < 1.0 // Physical limit of simplicial mesh
+    }
 }

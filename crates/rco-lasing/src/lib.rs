@@ -16,3 +16,5 @@ pub mod quantum;
 pub mod fusion;
 pub mod recursive;
 pub mod evolution;
+pub mod correction;
+pub mod omega;

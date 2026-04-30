@@ -97,3 +97,27 @@ harness = false
 [[bench]]
 name = "thermal_stability"
 harness = false
+
+[[bench]]
+name = "self_correction"
+harness = false
+
+[[bench]]
+name = "meta_stability"
+harness = false
+
+[[bench]]
+name = "planetary_synthesis"
+harness = false
+
+[[bench]]
+name = "sovereign_identity"
+harness = false
+
+[[bench]]
+name = "sovereign_closure"
+harness = false
+
+[[bench]]
+name = "omega_invariance"
+harness = false

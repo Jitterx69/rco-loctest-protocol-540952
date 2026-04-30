@@ -2,16 +2,19 @@
 //!
 //! Governs the reflexive feedback force and manifold coherence.
 
-use nalgebra::{DMatrix, DVector};
-use rco_reflexive::jacobian::ReflexiveJacobian;
-use crate::rfc::RecursiveFeedbackController;
 use crate::damper::ActiveResonantDamper;
+use crate::evolution::AutonomousManifoldEvolution;
+use crate::correction::RecursiveSelfCorrection;
+use crate::omega::OmegaFinalityController;
+use crate::fusion::LorentzInvariantFusion;
 use crate::lee::LatentEmulationEngine;
 use crate::mrl::MetaReflexiveLoop;
 use crate::quantum::QuantumBoundJitterController;
-use crate::fusion::LorentzInvariantFusion;
 use crate::recursive::HyperRecursiveFinality;
-use crate::evolution::AutonomousManifoldEvolution;
+use crate::rfc::RecursiveFeedbackController;
+use nalgebra::{DMatrix, DVector};
+use sha3::Digest;
+use rco_reflexive::jacobian::ReflexiveJacobian;
 
 /// Represents the Lasing Controller.
 pub struct LasingController {
@@ -47,6 +50,12 @@ pub struct LasingController {
     pub recursive: HyperRecursiveFinality,
     /// Autonomous Evolution (Stage-IV Phase-I)
     pub evolution: AutonomousManifoldEvolution,
+    /// Recursive Self-Correction (Stage-IV Phase-III)
+    pub correction: RecursiveSelfCorrection,
+    /// Autonomous Identity (Stage-IV Phase-IV)
+    pub identity: Option<[u8; 32]>,
+    /// Omega Finality (Stage-IV Phase-V)
+    pub omega_finality: OmegaFinalityController,
     /// Omega Point achieved?
     pub omega_achieved: bool,
 }
@@ -71,31 +80,39 @@ impl LasingController {
             fusion: LorentzInvariantFusion::new(),
             recursive: HyperRecursiveFinality::new(),
             evolution: AutonomousManifoldEvolution::new(),
+            correction: RecursiveSelfCorrection::new(),
+            identity: None,
+            omega_finality: OmegaFinalityController::new(),
             omega_achieved: false,
         }
     }
 
     /// Computes the coherent force update using PID-Reflexive Loop and ARD.
-    pub fn compute_lasing_force(&mut self, epsilon: &DVector<f64>, jacobian: &DMatrix<f64>) -> DVector<f64> {
+    pub fn compute_lasing_force(
+        &mut self,
+        epsilon: &DVector<f64>,
+        jacobian: &DMatrix<f64>,
+    ) -> DVector<f64> {
         let current_drift = epsilon.norm();
-        
+
         // 1. Proportional: Instantaneous drift correction
         let jt = jacobian.transpose();
         let gradient = jt * epsilon;
-        
+
         // 2. Integral: Summed errors over time
         self.integral_error += current_drift;
-        
+
         // 3. Reflexive: Predictive compensation based on curvature change
         let reflexive_comp = current_drift - self.prev_drift;
         self.prev_drift = current_drift;
 
         // 4. RFC: Hierarchical gain synchronization
         let target_gain = self.rfc.synchronize_step(self.lambda, 0.99, current_drift);
-        
+
         // Total Optimization Force: F = -[target_gain*P + ki*I + kr*R] * G * Gradient
-        let total_gain = (target_gain + self.ki * self.integral_error + self.kr * reflexive_comp) * self.gain;
-        
+        let total_gain =
+            (target_gain + self.ki * self.integral_error + self.kr * reflexive_comp) * self.gain;
+
         // Level-1 Safety: Gain Clamp
         let clamped_gain = total_gain.clamp(0.0, 5.0);
 
@@ -104,7 +121,7 @@ impl LasingController {
         // 5. ARD: Mode 3.4 Harmonic Suppression
         let echoes = self.ard.detect_echoes(&force);
         let counter_pulse = self.ard.generate_counter_pulse(&echoes);
-        
+
         // Apply counter-pulse if dimensions match (simplified)
         if counter_pulse.len() == force.len() {
             force += counter_pulse;
@@ -155,14 +172,31 @@ impl LasingController {
         let fitness = self.evolution.evaluate_fitness(force.norm());
         self.lambda = self.evolution.adapt_gain(self.lambda);
 
-        // 14. Thermal Damping Gain (Phase-II Stage-IV)
-        // Adjust damping based on enclave cluster temperature.
-        // Simplified: Assume T = 1.0K base + evolution noise
-        let t_cluster = 1.0 + (self.evolution.generation as f64 * 0.001).min(3.0);
-        let thermal_damping = (t_cluster / 1.0).sqrt();
-        force *= 1.0 / thermal_damping;
+        // 14. Recursive Self-Correction (Phase-III Stage-IV)
+        // Apply meta-lasing damping based on stability index
+        let meta_stability = self.correction.compute_meta_stability(force.norm());
+        force *= meta_stability;
 
-        // 15. Omega Point Detection
+        // 15. Multi-Manifold Sovereign Fusion (Phase-IV Stage-IV)
+        // If Omega achieved, synthesize Autonomous Identity
+        if force.norm() < 1e-12 && self.identity.is_none() {
+            let mut hasher = sha3::Sha3_256::new();
+            for val in force.as_slice() {
+                hasher.update(val.to_be_bytes());
+            }
+            let root = hasher.finalize();
+            let mut root_bytes = [0u8; 32];
+            root_bytes.copy_from_slice(root.as_slice());
+            self.identity = Some(root_bytes);
+        }
+
+        // 16. Omega Finality Closure (Phase-V Stage-IV)
+        // Neutralize all external gradients if finality is achieved
+        if self.omega_achieved {
+            self.omega_finality.neutralize_gradient(&mut force);
+        }
+
+        // 17. Omega Point Detection
         if force.norm() < 1e-12 {
             self.omega_achieved = true;
         }
@@ -192,7 +226,7 @@ impl LasingController {
         } else {
             self.gain *= 0.95; // Reduce gain to prevent oscillation
         }
-        
+
         // Safety bound: G < G_max
         if self.gain > 2.0 {
             self.gain = 2.0;
@@ -208,10 +242,7 @@ mod tests {
     fn test_lasing_force() {
         let mut controller = LasingController::new(3, 2, 0.5, 1.0);
         let epsilon = DVector::from_vec(vec![0.1, -0.05]);
-        let jacobian = DMatrix::from_vec(2, 3, vec![
-            1.0, 0.0, 0.5,
-            0.0, 1.0, 0.5
-        ]);
+        let jacobian = DMatrix::from_vec(2, 3, vec![1.0, 0.0, 0.5, 0.0, 1.0, 0.5]);
 
         let force = controller.compute_lasing_force(&epsilon, &jacobian);
         assert_eq!(force.len(), 3);

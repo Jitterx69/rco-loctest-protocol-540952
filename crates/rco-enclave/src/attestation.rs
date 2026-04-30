@@ -76,6 +76,37 @@ impl HardwareQuote {
     }
 }
 
+/// Autonomous Identity Attestation (AIA).
+pub struct AutonomousIdentity {
+    pub manifold_id: [u8; 32],
+    pub generation: u64,
+}
+
+impl AutonomousIdentity {
+    pub fn verify_sovereignty(&self, expected_root: &[u8; 32]) -> bool {
+        // Manifold ID must be derived from the manifold root
+        let mut hasher = Keccak256::new();
+        hasher.update(b"RCO-AUTONOMOUS-IDENTITY-v4");
+        hasher.update(expected_root);
+        let derived_id = hasher.finalize();
+        self.manifold_id == derived_id.as_slice()
+    }
+}
+
+/// Cross-Cluster Handshake logic.
+pub struct CrossClusterHandshake;
+
+impl CrossClusterHandshake {
+    pub fn perform_handshake(local_root: &[u8; 32], remote_root: &[u8; 32]) -> [u8; 32] {
+        let mut hasher = Keccak256::new();
+        hasher.update(local_root);
+        hasher.update(remote_root);
+        let mut session_key = [0u8; 32];
+        session_key.copy_from_slice(&hasher.finalize());
+        session_key
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
