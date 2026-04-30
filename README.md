@@ -6,8 +6,6 @@
 ![Rust](https://img.shields.io/badge/rust-1.75%2B-blue)
 ![Julia](https://img.shields.io/badge/julia-1.9%2B-purple)
 
-## Abstract & Executive Summary
-
 ## Abstract & Executive Summary: The Dawn of Sovereign Intelligence
 
 The **Reflexive Control Overlays (RCO) Protocol** represents a fundamental departure from traditional distributed systems theory, shifting the paradigm from linear, discrete-state ledgers to continuous, multi-dimensional **Topological Manifolds**. Tailored for high-frequency autonomous agentic coordination, RCO resolves the terminal throughput and latency bottlenecks of legacy blockchain architectures by replacing global linear synchronization with localized geometric coherence.
