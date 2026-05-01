@@ -1,1 +1,22 @@
+# Rust
 target/
+Cargo.lock
+
+# Julia
+.DS_Store
+*.jl.cov
+*.jl.mem
+manifest.json
+project.toml
+
+# Distribution
+dist/
+rco-v5.tar.gz
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

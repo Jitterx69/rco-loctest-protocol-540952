@@ -1,9 +1,10 @@
+//! Bencode Grammar (G_RCO):
+//!
 //! <element>    ::= <string> | <integer> | <list> | <dictionary>
 //! <string>     ::= <len> ":" <bytes>
 //! <integer>    ::= "i" <number> "e"
 //! <list>       ::= "l" <element>+ "e"
 //! <dictionary> ::= "d" (<string> <element>)+ "e"
-//! ```
 //!
 //! Dictionary keys MUST be in strict lexicographic order (byte-by-byte).
 //! No leading zeros. No negative zero. Max recursion depth: 16.

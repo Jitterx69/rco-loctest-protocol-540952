@@ -1,0 +1,9 @@
+name = "RCO"
+uuid = "47693e64-1ad3-4ef1-adef-398a9ab3b399"
+authors = ["Mohit Ranjan <mohit@mrrg.io>"]
+version = "5.0.0"
+
+[deps]
+Libdl = "8f399da3-3557-5675-b5ff-fb57abc8055a"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fca9c553a"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"

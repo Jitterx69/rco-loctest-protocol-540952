@@ -2,18 +2,18 @@
 //!
 //! Evaluates manifold coherence stability under high-velocity ingestion (Target: 5M steps/sec).
 
-use criterion::{criterion_group, criterion_main, Criterion, black_box};
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use nalgebra::{DMatrix, DVector};
 use rco_lasing::controller::LasingController;
 
 fn bench_lasing_throughput(c: &mut Criterion) {
     let mut group = c.benchmark_group("LASING-THROUGHPUT");
-    
+
     for load in [1000, 5000, 10000].iter() {
         group.bench_with_input(format!("load_{}_steps", load), load, |b, &load| {
             let param_dim = 100;
             let obs_dim = 10;
-            let controller = LasingController::new(param_dim, obs_dim, 0.5, 1.0);
+            let mut controller = LasingController::new(param_dim, obs_dim, 0.5, 1.0);
             let epsilon = DVector::from_element(obs_dim, 0.01);
             let jacobian = DMatrix::from_element(obs_dim, param_dim, 0.1);
 

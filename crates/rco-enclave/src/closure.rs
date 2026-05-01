@@ -4,6 +4,17 @@
 
 use sha3::{Digest, Sha3_256};
 
+/// Represents a self-attesting root of the manifold.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SelfAttestingRoot {
+    /// The root hash derived from the manifold state.
+    pub root_hash: [u8; 32],
+    /// The autonomous signature.
+    pub signature: [u8; 64],
+    /// Creation timestamp.
+    pub timestamp: u64,
+}
+
 /// Sovereign Closure kernel.
 pub struct SovereignClosure {
     pub closure_achieved: bool,

@@ -1,4 +1,4 @@
-# Reflexive Control Overlays (RCO) Protocol
+# Reflexive Cryptographic Observation (RCO) Protocol
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/Status-Stage--I_Certified-brightgreen)
@@ -6,9 +6,10 @@
 ![Rust](https://img.shields.io/badge/rust-1.75%2B-blue)
 ![Julia](https://img.shields.io/badge/julia-1.9%2B-purple)
 
+
 ## Abstract & Executive Summary: The Dawn of Sovereign Intelligence
 
-The **Reflexive Control Overlays (RCO) Protocol** represents a fundamental departure from traditional distributed systems theory, shifting the paradigm from linear, discrete-state ledgers to continuous, multi-dimensional **Topological Manifolds**. Tailored for high-frequency autonomous agentic coordination, RCO resolves the terminal throughput and latency bottlenecks of legacy blockchain architectures by replacing global linear synchronization with localized geometric coherence.
+The **Reflexive Cryptographic Observation (RCO) Protocol** represents a fundamental departure from traditional distributed systems theory, shifting the paradigm from linear, discrete-state ledgers to continuous, multi-dimensional **Topological Manifolds**. Tailored for high-frequency autonomous agentic coordination, RCO resolves the terminal throughput and latency bottlenecks of legacy blockchain architectures by replacing global linear synchronization with localized geometric coherence.
 
 ### I. The Terminal Crisis of Classical Consensus
 Traditional distributed ledgers—dependent on strict linear causality and globally ordered blocks—are physically incapable of processing the high-velocity, high-dimensional telemetry required for real-time robotic swarms, planetary-scale energy grids, and high-frequency decentralized liquidity. Legacy BFT systems (e.g., Paxos, Raft, HotStuff) suffer from **Consensus Stall** in agentic environments due to state-space explosion and leader bottlenecks. The latency penalties of globally synchronized state transitions render these systems functionally obsolete in environments where the logical speed of coordination must approach the physical speed of information.
@@ -340,96 +341,254 @@ By anchoring the project in TLA+, we ensure that the RCO Protocol's transition t
 
 ## System Requirements & Setup
 
-### Prerequisites
-- **Operating System:** Linux (Ubuntu 22.04+ or equivalent recommended for optimal memory mapping).
-- **Rust Toolchain:** `1.75+` (Nightly compiler is recommended to leverage AVX-512 SIMD optimizations).
-- **Julia:** `1.9+` (Required for building `rco-sdk-julia` and executing the TopologicalFeedback C-ABI bindings).
-- **TLC Model Checker:** Required for evaluating and compiling the `.tla` formal specifications.
+To achieve the performance and security guarantees of the RCO Protocol, the development environment must be tuned for high-precision memory mapping and low-latency FFI execution.
 
-### Building the Workspace
-The project is structured as a standard Rust Cargo workspace. To build all crates and bindings:
+### 1. Hardware Requirements
+RCO is engineered to leverage modern silicon features for its cryptographic and geometric kernels.
+
+*   **Processor:** x86_64 architecture with support for **AVX-512** (highly recommended for `rco-alignment` throughput) or **ARM64** (Apple Silicon/Graviton) with NEON support.
+*   **Memory:** Minimum 16GB RAM. The protocol utilizes large page tables for the **Causal Chain** buffer to minimize TLB misses.
+*   **Security (Optional but Recommended):** 
+    *   **Intel SGX** (Software Guard Extensions) or **AMD SEV** (Secure Encrypted Virtualization) for Stage-V isolation.
+    *   **TPM 2.0** for hardware-bound identity attestation.
+
+### 2. Software Prerequisites
+Ensure your development machine is equipped with the following stack:
+
+*   **Operating System:** 
+    *   **Linux:** Ubuntu 22.04 LTS or Debian 12 recommended. Requires `libssl-dev` and `build-essential`.
+    *   **macOS:** Ventura 13.0+ (requires Homebrew for `openssl@3`).
+*   **Rust Toolchain (1.75+):** 
+    ```bash
+    # Install the stable toolchain
+    rustup toolchain install stable
+    # (Optional) Install nightly for experimental SIMD features
+    rustup toolchain install nightly
+    ```
+*   **Julia (1.10+):** Required for the orchestration layer and high-level SDK bindings. Ensure `julia` is in your system `PATH`.
+*   **Formal Verification Tools:** 
+    *   **TLC Model Checker:** Required to verify and compile the `.tla` specifications in the `specs/` directory.
+
+### 3. Assembling the Workspace
+The RCO project is a modular Rust Cargo workspace. You can build individual kernels or the entire fabric.
+
+**A. Full Workspace Build:**
 ```bash
 # Clone the repository
-git clone https://github.com/Jitterx69/rco-loctest-protocol-540952.git
+git clone https://github.com/Jitterx69/rco-protocol.git
 cd rco-protocol
 
-# Build in highly-optimized release mode
-cargo build --workspace --release
+# Build all crates in release mode
+# This optimizes for the host CPU architecture (AVX/SIMD)
+RUSTFLAGS="-C target-cpu=native" cargo build --workspace --release
 ```
 
-### Running the Benchmark Suite
-The RCO Protocol mandates rigorous performance checks. The repository contains `criterion` micro-benchmarks for all Phase thresholds. To run the full suite:
+**B. Target-Specific Builds:**
+If you only need the shared library for a specific language binding (e.g., Python or Julia):
 ```bash
-# Run all core mathematical unit tests
+# Build the SDK FFI layer
+cargo build --release -p rco-sdk-julia
+```
+
+### 4. Rigorous Verification & Benchmarking
+The RCO Protocol follows a "Verify-Before-Commit" philosophy. 
+
+**Unit & Integration Tests:**
+```bash
+# Run all unit tests across the workspace
 cargo test --workspace
 
-# Benchmark the Topological Manifold Alignment (Phase-IV)
+# Run integration tests for the full pipeline
+cargo test --test integration_pipeline
+```
+
+**Performance Benchmarking:**
+We use `criterion` for high-precision micro-benchmarks.
+```bash
+# Benchmark the p14 projection kernel
 cargo bench -p rco-alignment
 
-# Benchmark the Recursive Verification Enclave isolation and throughput (Phase-V)
-cargo bench -p rco-enclave
+# Benchmark the Merkle-Causal Chain throughput
+cargo bench -p rco-merkle
 ```
 
-### Julia SDK Integration
-For scientific researchers modeling agent swarms or implementing reinforcement learning loops, the Julia SDK provides native bindings into the core Rust kernels without sacrificing throughput.
-
-```julia
-using RCO
-
-# Initialize the research agent and bind to the local Hardware Enclave
-RCO.initialize_agent(1)
-
-# Ingest high-frequency telemetry matrices
-telemetry_data = generate_agent_state()
-RCO.ingest_telemetry_batch(telemetry_data)
-
-# Query the topological gradient and apply Active Lasering feedback
-gradient = RCO.calculate_simplicial_gradient(telemetry_data)
-RCO.apply_lasering!(agent_weights, gradient, damping=0.05)
+**Formal Verification (TLA+):**
+To verify the consensus logic against the formal specs:
+```bash
+# Run the TLC model checker on the Shard Alignment spec
+cd specs/tla
+tlc RCO_Shard_Align.tla
 ```
+
+### 5. Troubleshooting & Common Issues
+*   **Missing `librco.so`**: If your language binding fails to load the library, ensure you have run the `scripts/setup.sh` script or manually added the `dist/` directory to your `LD_LIBRARY_PATH`.
+*   **AVX-512 Compile Errors**: If building on older hardware, remove `target-cpu=native` from the build flags or explicitly set it to a compatible architecture.
+*   **Julia Dependency Issues**: If `start.jl` fails to load `JSON`, run the `setup.sh` script which automatically provisions the required Julia environment.
 
 ---
 
-## Real-World Applications: The Sovereign Infrastructure
+---
 
-The achievement of **Total Sovereign Closure** and **Omega Finality** elevates the RCO Protocol from a high-performance consensus engine to a foundational substrate for autonomous reality. The extreme throughput, active geometric alignment, and hardware-agnostic sovereignty make it uniquely suited for the most critical sectors of the future economy.
+## Real-World Applications: RCO Infrastructure
+
+The achievement of **Stability** and **Finality** elevates the RCO Protocol from a high-performance consensus engine to a foundational substrate for autonomous systems. 
 
 ### I. Planetary-Scale Autonomous Swarm Coordination
-Traditional UAV and robotic swarms rely on brittle centralized or mesh-based communication that collapses under network latency or localized electronic warfare. RCO solves this by modeling the swarm as a **Simplicial Manifold**.
-- **Topological Formation Flight:** Hundreds of thousands of autonomous agents can maintain precise geometric formations by aligning their local kinematic states with the **Global Omega Attractor**.
-- **Resilient Autonomy:** Using **Topological Snap-Backs**, a swarm can autonomously "heal" its formation if individual nodes are destroyed or jammed. The manifold root remains invariant, ensuring the mission objective persists even if the physical node composition changes by more than 50%.
-- **Relativistic Coordination:** **Lorentz-Invariant Fusion** allows for the synchronization of swarms across planetary distances (e.g., satellite constellations), where signal delay is treated as a geometric curvature rather than a failure mode.
+Traditional UAV and robotic swarms rely on brittle centralized or mesh-based communication. RCO solves this by modeling the swarm as a **Unified Fabric**.
+- **Formation Flight:** Hundreds of thousands of autonomous agents can maintain precise geometric formations by aligning their local states.
+- **Resilient Autonomy:** A swarm can autonomously "heal" its formation if individual nodes are destroyed or jammed. The fabric remains intact, ensuring the mission objective persists even if the physical node composition changes.
 
-### II. Sovereign High-Frequency Liquidity Manifolds (DeFi 3.0)
-The current DeFi landscape suffers from front-running (MEV) and fragmented liquidity. RCO introduces the concept of a **Sovereign Liquidity Manifold**.
-- **MEV-Elimination via Causal Ordering:** The **Merkle-Causal Chain** provides absolute, sub-millisecond ordering of transactions. Because the ordering is a mathematical invariant of the manifold, front-running is physically impossible at the protocol level.
-- **Global Liquidity Alignment:** **Multi-Cluster Sovereign Synthesis** allows disparate liquidity pools (across different chains or continents) to entangle into a single sovereign fabric. This enables "Zero-Slippage" cross-border settlements where the value transfer is an invariant of the manifold evolution.
-- **Total Sovereign Finality:** With **Sovereign Closure**, financial systems no longer require external auditing bodies. The system is its own auditor, providing a mathematically certain Root-of-Trust for trillion-dollar liquidity flows.
+### II. High-Frequency Liquidity (DeFi 3.0)
+The current DeFi landscape suffers from front-running (MEV) and fragmented liquidity. RCO introduces **Unified Liquidity**.
+- **MEV-Elimination:** The **Causal Chain** provides absolute, sub-millisecond ordering of transactions.
+- **Global Alignment:** Disparate liquidity pools (across different chains or continents) can entangle into a single fabric. 
 
-### III. Decentralized Meta-Intelligence & Federated AI
-Training massive AI models (LLMs/RL) across distributed hardware is currently limited by the "Trust-Efficiency" trade-off. RCO bridges this via **Recursive Cross-Attestation**.
-- **Manifold-Locked Training:** Aligning neural weights across untrusted, distributed TEE enclaves. The **Autonomous Manifold Evolution (AME)** kernel ensures that the training trajectory remains within the optimal fitness landscape, actively correcting divergent updates from malicious or failing nodes.
-- **Self-Attesting Model Identity:** Models trained on RCO possess an **Autonomous Identity Attestation (AIA)**. This proves the model's provenance and training integrity without exposing the raw telemetry or proprietary datasets, enabling a "Sovereign AI" that owns its own weights.
-- **Hardware-Agnostic LLMs:** AI policies can migrate across hardware clusters (from NVIDIA to Intel to TPU) without losing their sovereign state, ensured by the **Recursive Hardware Inversion** implemented in Stage-IV.
+### III. Decentralized Intelligence & Federated AI
+Training massive AI models across distributed hardware is currently limited by efficiency. RCO bridges this via **Cross-Attestation**.
+- **Locked Training:** Aligning neural weights across distributed enclaves. The **AME** kernel ensures that the training trajectory remains optimal.
+- **Self-Attesting Identity:** Models trained on RCO possess a **Digital Proof**. This proves the model's provenance and training integrity.
 
-### IV. Critical Infrastructure & Energy Manifold Stability
-Global energy grids and industrial IoT systems are increasingly vulnerable to cascading failures and cyber-physical attacks.
-- **Energy Manifold Balancing:** Modeling the national power grid as a simplicial complex. RCO's **Meta-Lasing** engine can actively dampen frequency oscillations and voltage drifts in real-time, executing "Topological Shunting" to isolate failing sub-grids before a collapse can propagate.
-- **Physically Invariant IoT:** Ensuring that industrial robotics and SCADA systems operate within strict safety bounds. **Thermal-Aware Gain Scheduling** prevents hardware stress during peak load, while the **Invariant Attractor Lock** ensures that critical valve or switch states cannot be altered by unauthorized external gradients.
+### IV. Critical Infrastructure & Energy Stability
+Global energy grids are increasingly vulnerable to cascading failures.
+- **Energy Balancing:** RCO's engine can actively dampen oscillations and voltage drifts in real-time.
+- **Physical Safety:** Ensuring that industrial robotics and SCADA systems operate within strict safety bounds.
 
-### V. Trans-National Sovereign Forensics & Auditability
-In a world of deep-fakes and disinformation, the need for a "Universal Truth Layer" is paramount.
-- **Immutable State Forensics:** The **Merkle-Causal Forensics** kernel allows any external auditor to reconstruct the exact evolutionary path of any manifold state with 100% certainty.
-- **Hardware-Agnostic Identity (AIA):** Enabling trans-national digital identities that are not controlled by any single state or corporation. A citizen's identity is an invariant of the **Sovereign Closure Root**, ensuring that their rights and data persist across all jurisdictions.
-- **Zero-Trust Governance:** Providing the mathematical substrate for **Decentralized Sovereign Organizations (DSOs)** that govern physical resources (water, spectrum, land) through formal TLA+ proven state transitions.
-
-The RCO Protocol is the blueprint for a world where coordination is no longer a human struggle, but a mathematical certainty.
+### V. Trans-National Forensics & Auditability
+In a world of deep-fakes and disinformation, a "Universal Truth Layer" is paramount.
+- **State Forensics:** The forensics kernel allows any auditor to reconstruct the exact path of any state with certainty.
+- **Digital Identity:** Enabling digital identities that are not controlled by any single entity. 
 
 ---
 
-## Detailed Versioning & Evolution Architecture
+## Universal Integration: The RCO Substrate
 
-The RCO Protocol's versioning schema reflects its architectural evolution from a distributed database to a self-sovereign intelligence substrate. Each major version represents a phase-shift in the system's topological complexity and coordination finality.
+RCO v5.0 is designed as a **Universal Substrate**—a language-agnostic foundation that can be dropped into any project to provide high-performance consensus, deterministic alignment, and hardware-bound security.
+
+### 1. Architecture Overview
+The RCO Substrate follows a **Binary-First** philosophy. The core logic is written in Rust for memory safety and zero-cost abstractions, then compiled into a standard **C-ABI Shared Library (`librco.so`)**. 
+
+This approach ensures that every integration, whether in Python or C++, calls the exact same machine code, guaranteeing **Mathematical Invariance** across your entire stack.
+
+---
+
+### 2. Getting Started: The 60-Second Drop-In
+To integrate RCO into your ecosystem, follow these steps:
+
+1.  **Extract the Bundle**:
+    ```bash
+    tar -xzf rco-v5.tar.gz
+    cd rco-v5
+    ```
+2.  **Environment Audit**: Run the automated setup to link the library and check dependencies.
+    ```bash
+    bash scripts/setup.sh
+    ```
+3.  **Link your Code**: Choose your language-specific binding from the `bindings/` directory.
+
+---
+
+### 3. Language-Specific Integration Guides
+
+#### A. Python (The Scripting Layer)
+Perfect for AI training, data science, and rapid prototyping. The Python binding is zero-dependency and uses the standard `ctypes` library.
+
+**Installation**: Simply copy `bindings/python/rco.py` into your project.
+
+```python
+from rco import project_p14, get_rco
+
+# 1. Deterministic Alignment
+# Projects any reward into the P14 integer space (2^-14 precision)
+reward = 3.14159265
+aligned_val = project_p14(reward)
+print(f"Aligned Fabric Value: {aligned_val}")
+
+# 2. Causal Data Ingestion
+# Sub-millisecond ordering of any binary data
+data = b"transaction_payload_001"
+status = get_rco().lib.rco_process_causal_chain(data, len(data))
+```
+
+#### B. C++ (The Performance Layer)
+Designed for HFT, Robotics, and Infrastructure. The C++ binding is a header-only wrapper around the C-ABI.
+
+**Installation**: Include `bindings/cpp/rco.hpp` and link against `dist/librco.so`.
+
+```cpp
+#include "rco.hpp"
+#include <iostream>
+
+int main() {
+    try {
+        // High-performance alignment with native __int128 support
+        double sensor_data = 0.99972;
+        __int128 fabric_id = rco::Engine::project_p14(sensor_data);
+        
+        std::cout << "Node Aligned to Fabric." << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Alignment Failed: " << e.what() << std::endl;
+    }
+    return 0;
+}
+```
+
+#### C. Julia (The Modeling Layer)
+The primary interface for complex topological simulations and high-level policy orchestration.
+
+**Installation**: Use `include("bindings/julia/RCO.jl")`.
+
+```julia
+using .RCO
+
+# Initialize an Ingestion Pipeline with a Quorum Threshold of 3
+pipeline = IngestionPipeline(threshold=3)
+
+# Ingest telemetry and automatically resolve the Merkle-Causal Chain
+ingest!(pipeline, "UAV_LEAD_NODE", [10.5, 20.1, 0.5])
+```
+
+#### D. Go, Rust, and Others (Generic FFI)
+For any other language, use the **Universal C-Header** located at `dist/librco.h`.
+- **Go**: Use `cgo` to link against `librco.so`.
+- **Rust**: Add `librco.so` to your `build.rs` or use `bindgen`.
+- **Node.js**: Use `ffi-napi` to load the library at runtime.
+
+---
+
+### 4. Workflow Integration Patterns
+
+#### CI/CD Pipeline Integration
+Add RCO to your automated testing to ensure your application state remains invariant during development.
+```yaml
+# Example: GitHub Action
+- name: RCO Invariance Check
+  run: |
+    bash scripts/setup.sh
+    julia scripts/test_migration.jl
+```
+
+#### Containerized Workflows (Docker)
+The provided `Dockerfile` allows you to spin up an RCO-enabled microservice in seconds. It handles all library pathing and dependency management out of the box.
+```bash
+docker build -t my-rco-app .
+docker run --rm my-rco-app
+```
+
+#### Hardware-Bound Security (TPM/TEE)
+If your environment supports Intel SGX or AMD SEV, RCO automatically detects the TEE and binds the **Digital Proof** to the physical silicon. This is enabled by default in the `librco.so` kernel and requires no code changes from the developer.
+
+---
+
+### 5. Best Practices for Developers
+*   **Memory Safety**: When passing buffers to `rco_process_causal_chain`, ensure the buffer remains valid for the duration of the call. RCO does not take ownership of your memory; it performs a zero-copy read.
+*   **Error Handling**: Always check the `int32_t` return status. A value of `0` indicates SUCCESS. Error codes are standardized across all language bindings (see `dist/librco.h` for definitions).
+*   **Thread Safety**: The RCO kernel is internally synchronized. You can safely call alignment and ingestion functions from multiple threads in your application.
+
+The RCO Substrate is not just a library—it is the glue that binds your heterogeneous development ecosystem into a single, stable, and verifiable fabric.
+
+---
+
+## Detailed Evolution & Stability
 
 ### I. The Foundation Era (v0.1.0 - v1.0.0)
 **Focus:** Causal Ordering and Simplicial Geometry.
@@ -505,4 +664,43 @@ The RCO Protocol is not just a technology; it is a **Topological Destiny**. We a
 ---
 
 ## Licensing & Governance
-*This project is proprietary research.* The mathematics, protocols, and architectural designs contained within this repository are the intellectual property of the RCO Research Division. Refer to the internal organizational guidelines and `LICENSE` file for usage rights, academic citations, and deployment permissions.
+
+The RCO Protocol and its associated technologies represent the culmination of advanced research in topological consensus, hardware-bound identity, and simplicial geometry. As such, the project is governed by strict intellectual property and ethical guidelines to ensure the integrity and stability of the global fabric.
+
+### 1. Intellectual Property (IP) Framework
+The RCO Research Division maintains exclusive rights to the following assets:
+*   **Mathematical Proofs:** All formal TLA+ specifications and the underlying Riemannian/Simplicial geometric proofs for consensus finality.
+*   **Protocol Specifications:** The Merkle-Causal Chain (MCC) architecture and the Autonomous Identity Attestation (AIA) handshake protocols.
+*   **Software Implementations:** The Rust-based kernels, the Julia SDK, and all associated FFI bindings contained within this workspace.
+
+### 2. Usage & Deployment Rights
+Access to the RCO Substrate is granted under a tiered licensing model:
+*   **Internal Research Use:** Authorized researchers within the RCO network may utilize the codebase for experimental simulations, stress testing, and topological modeling.
+*   **Commercial Deployment:** Production use of the RCO Protocol in any financial, industrial, or critical infrastructure setting requires a **Sovereign Deployment Certificate (SDC)**. Deployments without a valid SDC are considered non-invariant and are not supported by the RCO Research Division.
+*   **Academic Use:** Non-commercial academic research is encouraged, provided that all publications strictly adhere to the citation guidelines below.
+
+### 3. Academic Citations & Reference
+When referencing the RCO Protocol in academic or technical publications, please use the following citation format:
+
+> *RCO Research Division. (2026). RCO v5.0: The Invariant Substrate for Autonomous Identity and Topological Consensus. Version 5.0.0-omega. [Proprietary Repository].*
+
+Include the **Kernel Hash** of the specific version used in your research to ensure reproducibility and cross-attestation of results.
+
+### 4. Ethical Governance & Responsibility
+The RCO Protocol provides unprecedented power over identity and consensus. Its use is governed by a set of **Ethical Invariants**:
+*   **Non-Centralization:** The protocol must not be used to create centralized choke-points that compromise the sovereign nature of the fabric.
+*   **Transparency of Invariance:** While data may be private, the *proof of invariance* must always be auditable by any stakeholder in the manifold.
+*   **Human-Centric Autonomy:** Autonomous systems governed by RCO must prioritize the safety and agency of human actors within their coordination radius.
+
+### 5. Contribution & Peer Review
+The RCO Research Division operates a **Closed-Loop Peer Review** system. 
+*   **External Audits:** We welcome security audits from recognized cryptographic and formal verification specialists.
+*   **Vulnerability Disclosure:** Any discovered "Drift" or "Linkage Gaps" in the protocol must be reported immediately to the RCO Security Council.
+*   **Collaborative Research:** Organizations interested in contributing to the **Recursive Hardware Inversion** or **Bio-Digital Fusion** stages should contact the Governance Committee for a research partnership agreement.
+
+### 6. Compliance & Regulatory Alignment
+The RCO Protocol is designed to be **Regulatorily Aware** but **Technologically Autonomous**. The forensics kernel provides a mathematical "Truth Layer" that can be used to prove compliance with jurisdictional regulations without sacrificing the underlying sovereignty of the identity root.
+
+---
+
+The RCO Protocol is more than code; it is a shared commitment to mathematical truth and coordination stability. By accessing this repository, you agree to uphold these standards of governance.

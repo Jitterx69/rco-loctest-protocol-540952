@@ -19,6 +19,7 @@ rco-p14 = { workspace = true }
 rco-bencode = { workspace = true }
 rco-merkle = { workspace = true }
 rco-ingestion = { workspace = true }
+rco-enclave = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }
