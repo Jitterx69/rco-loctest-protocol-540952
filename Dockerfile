@@ -1,5 +1,5 @@
 # RCO Node
-FROM julia:1.12-bookworm
+FROM julia:1.10-bookworm
 
 WORKDIR /app
 RUN mkdir -p /app/dist /app/crates/rco-sdk-julia/julia
