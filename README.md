@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Status](https://img.shields.io/badge/Status-Stage--IV_Certified-brightgreen)
-![Version](https://img.shields.io/badge/version-v1.0.0-blue)
+![Version](https://img.shields.io/badge/version-Ωv5.0.0-blue)
 ![Rust](https://img.shields.io/badge/rust-1.75%2B-blue)
 ![Julia](https://img.shields.io/badge/julia-1.9%2B-purple)
 
