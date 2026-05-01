@@ -7,7 +7,7 @@
 ![Julia](https://img.shields.io/badge/julia-1.9%2B-purple)
 
 
-## Abstract & Executive Summary: The Dawn of Sovereign Intelligence
+## Abstract & Executive Summary
 
 The **Reflexive Cryptographic Observation (RCO) Protocol** represents a fundamental departure from traditional distributed systems theory, shifting the paradigm from linear, discrete-state ledgers to continuous, multi-dimensional **Topological Manifolds**. Tailored for high-frequency autonomous agentic coordination, RCO resolves the terminal throughput and latency bottlenecks of legacy blockchain architectures by replacing global linear synchronization with localized geometric coherence.
 
@@ -294,8 +294,6 @@ In the Omega State, the RCO Protocol becomes a mathematically closed, self-gover
 
 ---
 
----
-
 ## Formal Verification (TLA+)
 
 Mathematical correctness and operational sovereignty are guaranteed through rigorous formal modeling. All critical state-machine transitions, BFT consensus mechanics, and autonomous evolutionary paths have been verified using **TLA+ (Temporal Logic of Actions)** and the **TLC Model Checker**.
@@ -424,8 +422,6 @@ tlc RCO_Shard_Align.tla
 *   **Missing `librco.so`**: If your language binding fails to load the library, ensure you have run the `scripts/setup.sh` script or manually added the `dist/` directory to your `LD_LIBRARY_PATH`.
 *   **AVX-512 Compile Errors**: If building on older hardware, remove `target-cpu=native` from the build flags or explicitly set it to a compatible architecture.
 *   **Julia Dependency Issues**: If `start.jl` fails to load `JSON`, run the `setup.sh` script which automatically provisions the required Julia environment.
-
----
 
 ---
 
