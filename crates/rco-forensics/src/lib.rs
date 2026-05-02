@@ -7,3 +7,4 @@
 
 pub mod tda;
 pub mod signatures;
+pub mod audit;

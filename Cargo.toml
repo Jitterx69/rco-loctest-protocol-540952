@@ -23,7 +23,7 @@ members = [
     "crates/rco-threshold",
     "crates/rco-reflexive",
     "crates/rco-lasing",
-    "crates/rco-zkmv",
+    "crates/rco-zkmv", "crates/rco-sdk-java", "crates/rco-sdk-node", "crates/rco-sdk-csharp",
 ]
 
 [workspace.package]

@@ -1,22 +1,54 @@
-# Rust
+# RCO Ψ-V5.1.0 Repository Filter
+# Ensures Forensic Purity by excluding transient build artifacts
+
+# --- Sovereign Distribution (DO NOT IGNORE) ---
+!dist/
+!dist/manifest.json
+!dist/lib/librco_core.so
+!dist/include/rco-core.h
+
+# --- Rust / Native ---
 target/
 Cargo.lock
+debug/
+release/
 
-# Julia
-.DS_Store
+# --- Java SDK ---
+*.class
+*.jar
+*.war
+bindings/java/com/rco/*.class
+
+# --- Node.js SDK ---
+node_modules/
+npm-debug.log
+bindings/node/build/
+bindings/node/index.node
+
+# --- C# SDK ---
+bindings/csharp/bin/
+bindings/csharp/obj/
+
+# --- Python / Ruby / PHP ---
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+bindings/ruby/.bundle/
+
+# --- Julia ---
 *.jl.cov
 *.jl.mem
-manifest.json
-project.toml
 
-# Distribution
-dist/
-rco-v5.tar.gz
+# --- Installer Staging ---
+release_staging/
+staging.*/
+.cache/rco_manifold/
 
-# IDE
+# --- IDE & OS ---
 .vscode/
 .idea/
-
-# OS
 .DS_Store
 Thumbs.db
+.env
+.history/

@@ -2,33 +2,45 @@
 //!
 //! Measures SNARK generation and verification overhead for manifold stability.
 
-use criterion::{criterion_group, criterion_main, Criterion, black_box};
-use rco_zkmv::proof::{generate_manifold_proof, verify_manifold_proof};
-use ark_groth16::Groth16;
 use ark_bls12_381::Bls12_381;
+use ark_groth16::Groth16;
 use ark_snark::SNARK;
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 use rand::thread_rng;
 use rco_zkmv::constraints::CoherenceCircuit;
+use rco_zkmv::proof::{generate_forensic_proof, verify_forensic_proof};
 
 fn bench_proof_generation(c: &mut Criterion) {
-    let mut group = c.benchmark_group("ZK-MV");
-    
-    group.bench_function("generate_proof", |b| {
+    let mut group = c.benchmark_group("ZK-MV-LATENCY");
+
+    let projection = 1000u64;
+    let entropy = 999u64;
+    let threshold = 995u64;
+    let hardware_id = 0xDEADBEEFu64;
+
+    // Use the forensic generator to get the proving/verifying keys
+    // In a benchmark, we want to isolate the proof generation/verification
+    let (_initial_proof, pk, vk) =
+        generate_forensic_proof(projection, entropy, threshold, hardware_id);
+
+    group.bench_function("generate_forensic_proof", |b| {
         b.iter(|| {
-            let _proof = black_box(generate_manifold_proof(1000, 999));
+            // Measure pure proof generation overhead
+            let _proof = black_box(generate_forensic_proof(
+                projection,
+                entropy,
+                threshold,
+                hardware_id,
+            ));
         })
     });
 
-    let mut rng = thread_rng();
-    let (pk, vk) = Groth16::<Bls12_381>::circuit_specific_setup(
-        CoherenceCircuit { coherence: None, threshold: None }, 
-        &mut rng
-    ).unwrap();
-    let proof = generate_manifold_proof(1000, 999);
+    let (proof, _, _) = generate_forensic_proof(projection, entropy, threshold, hardware_id);
 
-    group.bench_function("verify_proof", |b| {
+    group.bench_function("verify_forensic_proof", |b| {
         b.iter(|| {
-            let _valid = black_box(verify_manifold_proof(&proof, &vk, &[1000, 999]));
+            // Measure pure verification overhead against public inputs
+            let _valid = black_box(verify_forensic_proof(&proof, &vk, threshold, hardware_id));
         })
     });
 

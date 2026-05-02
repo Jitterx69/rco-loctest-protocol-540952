@@ -1,0 +1,22 @@
+[package]
+name = "rco-sdk-node"
+description = "RCO Protocol — Node.js SDK (Node-API Bindings)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "2.16", features = ["async", "napi6"] }
+napi-derive = "2.16"
+rco-p14 = { path = "../rco-p14" }
+rco-types = { path = "../rco-types" }
+rco-enclave = { path = "../rco-enclave" }
+rco-quorum = { path = "../rco-quorum" }
+group = "0.13"
+
+[build-dependencies]
+napi-build = "2.1"

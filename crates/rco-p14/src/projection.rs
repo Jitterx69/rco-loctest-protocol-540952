@@ -161,6 +161,47 @@ pub fn project_p14(r: f64) -> Result<ProjectedReward, RcoError> {
     Ok(ProjectedReward(projected))
 }
 
+#[cfg(p14_asm)]
+unsafe extern "C" {
+    fn rco_p14_project_batch_avx512(input: *const f64, count: usize, output: *mut i128);
+    fn rco_p14_project_batch_neon(input: *const f64, count: usize, output: *mut i128);
+}
+
+/// Projects a batch of rewards using the most efficient available method.
+pub fn project_p14_batch(rewards: &[f64], output: &mut [i128]) -> Result<(), RcoError> {
+    if rewards.len() != output.len() {
+        return Err(RcoError::BufferTooSmall {
+            required: rewards.len(),
+            available: output.len(),
+        });
+    }
+
+    #[cfg(p14_asm)]
+    {
+        #[cfg(all(target_arch = "x86_64", feature = "std"))]
+        if std::is_x86_feature_detected!("avx512f") {
+            unsafe {
+                rco_p14_project_batch_avx512(rewards.as_ptr(), rewards.len(), output.as_mut_ptr());
+            }
+            return Ok(());
+        }
+
+        #[cfg(target_arch = "aarch64")]
+        {
+            unsafe {
+                rco_p14_project_batch_neon(rewards.as_ptr(), rewards.len(), output.as_mut_ptr());
+            }
+            return Ok(());
+        }
+    }
+
+    // Fallback to scalar Rust implementation
+    for (i, &r) in rewards.iter().enumerate() {
+        output[i] = project_p14(r)?.raw();
+    }
+    Ok(())
+}
+
 /// Recovers an approximate `f64` from a P14-projected value.
 ///
 /// # Important
@@ -402,5 +443,18 @@ mod tests {
         let projected = project_p14(original).unwrap();
         let recovered = unproject_p14(projected);
         assert!((original - recovered).abs() < 1e-14);
+    }
+
+    #[test]
+    fn test_project_p14_batch() {
+        let rewards = [1.0, 2.0, 3.14159, -0.5, 0.0, 100.0, 9.2e4, -9.2e4];
+        let mut out = [0i128; 8];
+        
+        project_p14_batch(&rewards, &mut out).unwrap();
+        
+        for i in 0..rewards.len() {
+            let expected = project_p14(rewards[i]).unwrap().raw();
+            assert_eq!(out[i], expected, "Batch index {i} mismatch");
+        }
     }
 }

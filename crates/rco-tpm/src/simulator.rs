@@ -2,8 +2,10 @@
 //!
 //! Emulates a hardware TPM's PCR registers and key hierarchies.
 
+use crate::TpmProvider;
 use rco_types::HashDigest;
-use sha2::{Sha256, Digest};
+use rco_types::error::RcoError;
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 
 /// A Platform Configuration Register (PCR).
@@ -45,9 +47,12 @@ impl TpmSimulator {
     }
 
     /// Extends a specific PCR.
-    pub fn pcr_extend(&mut self, index: u32, data: &[u8]) {
+    pub fn pcr_extend(&mut self, index: u32, data: &[u8]) -> Result<(), RcoError> {
         if let Some(pcr) = self.pcrs.get_mut(&index) {
             pcr.extend(data);
+            Ok(())
+        } else {
+            Err(RcoError::NumericalIntegrityFault)
         }
     }
 
@@ -69,8 +74,64 @@ impl TpmSimulator {
     }
 }
 
+impl TpmProvider for TpmSimulator {
+    fn pcr_read(&self, index: u32) -> Result<HashDigest, RcoError> {
+        self.pcrs
+            .get(&index)
+            .map(|p| p.value)
+            .ok_or(RcoError::NumericalIntegrityFault) // Use a suitable error
+    }
+
+    fn pcr_extend(&mut self, index: u32, data: &[u8]) -> Result<(), RcoError> {
+        if let Some(pcr) = self.pcrs.get_mut(&index) {
+            pcr.extend(data);
+            Ok(())
+        } else {
+            Err(RcoError::NumericalIntegrityFault)
+        }
+    }
+
+    fn quote(&self, selection: &[u32], _nonce: &[u8]) -> Result<Vec<u8>, RcoError> {
+        // Mock quote: just the composite digest
+        Ok(self.pcr_composite_digest(selection).to_vec())
+    }
+
+    fn get_ek_public(&self) -> Result<Vec<u8>, RcoError> {
+        // Mock EK public key
+        Ok(vec![0xDE, 0xAD, 0xBE, 0xEF])
+    }
+}
+
 impl Default for TpmSimulator {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tpm_provider_trait() {
+        let mut tpm_sim = TpmSimulator::new();
+        let tpm: &mut dyn TpmProvider = &mut tpm_sim;
+
+        // Initial state
+        let pcr0 = tpm.pcr_read(0).unwrap();
+        assert_eq!(pcr0, [0u8; 32]);
+
+        // Extension
+        tpm.pcr_extend(0, b"measurement").unwrap();
+        let pcr0_ext = tpm.pcr_read(0).unwrap();
+        assert_ne!(pcr0, pcr0_ext);
+
+        // Quote
+        let quote = tpm.quote(&[0], b"nonce").unwrap();
+        assert_eq!(quote, pcr0_ext.to_vec());
+
+        // EK
+        let ek = tpm.get_ek_public().unwrap();
+        assert!(!ek.is_empty());
     }
 }

@@ -20,3 +20,6 @@ criterion = { workspace = true }
 [[bench]]
 name = "p14_throughput"
 harness = false
+
+[build-dependencies]
+cc = "1.0"

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  rco-node-1:
+    build: .
+    container_name: rco-psi-1
+    environment:
+      - RCO_NODE_ID=1
+      - RCO_TPM_DEVICE=/dev/tpmrm0
+    devices:
+      - /dev/tpmrm0:/dev/tpmrm0
+    networks:
+      - rco-manifold
+
+  rco-node-2:
+    build: .
+    container_name: rco-psi-2
+    environment:
+      - RCO_NODE_ID=2
+      - RCO_TPM_DEVICE=/dev/tpmrm0
+    devices:
+      - /dev/tpmrm0:/dev/tpmrm0
+    networks:
+      - rco-manifold
+
+  rco-node-3:
+    build: .
+    container_name: rco-psi-3
+    environment:
+      - RCO_NODE_ID=3
+      - RCO_TPM_DEVICE=/dev/tpmrm0
+    devices:
+      - /dev/tpmrm0:/dev/tpmrm0
+    networks:
+      - rco-manifold
+
+  rco-auditor:
+    image: node:20-alpine
+    container_name: rco-sentinel-audit
+    working_dir: /opt/audit
+    volumes:
+      - ./crates/rco-forensics:/opt/audit
+    command: "node audit_monitor.js"
+    networks:
+      - rco-manifold
+    depends_on:
+      - rco-node-1
+      - rco-node-2
+      - rco-node-3
+
+networks:
+  rco-manifold:
+    driver: bridge

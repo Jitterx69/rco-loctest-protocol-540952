@@ -16,4 +16,5 @@ pub mod handshake;
 pub mod dgq;
 pub mod synthesis;
 pub mod closure;
+pub mod hardware;
 pub mod identity_export;

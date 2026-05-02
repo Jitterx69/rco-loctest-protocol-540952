@@ -1,13 +1,45 @@
-# Reflexive Cryptographic Observation (RCO) Protocol
+# RCO Protocol: Ψ-V5.1.0 "Sovereign Inversion"
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/Status-Stage--IV_Certified-brightgreen)
-![Version](https://img.shields.io/badge/version-Ωv5.0.0-blue)
-![Rust](https://img.shields.io/badge/rust-1.75%2B-blue)
-![Julia](https://img.shields.io/badge/julia-1.9%2B-purple)
+![Status](https://img.shields.io/badge/Status-%CE%A8--Sovereign--Inversion-blueviolet)
+![Version](https://img.shields.io/badge/version-%CE%A8v5.1.0-blue)
+![Rust](https://img.shields.io/badge/rust-1.77%2B-blue)
+![Node](https://img.shields.io/badge/node-20%2B-green)
 
+## Quick Start: Sovereign Deployment
+Deploy a 3-node local manifold with integrated Sentinel auditing using Docker:
 
-## Abstract & Executive Summary
+```bash
+# Clone the repository
+git clone https://github.com/rco-protocol/rco-core.git
+cd rco-core
+
+# Deploy the Ψ-Manifold
+docker-compose up -d
+```
+
+## Polyglot SDK Integration
+Integrate the RCO manifold into your engineering stack with zero runtime overhead:
+
+| Language | Package Manager | Command |
+| :--- | :--- | :--- |
+| **Node.js** | NPM | `npm install @rco/sdk-node` |
+| **Java** | Maven | `mvn install:install-file -Dfile=rco-sdk-java-v5.1.0.jar` |
+| **PHP** | Composer | `composer require rco-protocol/sdk-php` |
+| **C#** | NuGet | `dotnet add package Rco.Protocol.Sdk` |
+
+## Hardware Sovereignty Requirements
+RCO-v5-Psi requires hardware-level trust. Ensure your host system satisfies the following:
+*   **TPM 2.0**: Required for AIK identity derivation and PCR-sealing.
+*   **Vector Extensions**: AVX-512 (x86_64) or NEON (AArch64) for the P14 kernel.
+*   **TEE**: Intel SGX or AMD SEV recommended for production-grade enclave isolation.
+
+## Sentinel Audit Interface
+Verify the absolute status of the manifold in real-time:
+*   **Audit Endpoint**: http://localhost:8080/audit/gih
+*   **Sovereignty Proof**: http://localhost:8080/audit/verify-zk
+
+---
 
 The **Reflexive Cryptographic Observation (RCO) Protocol** represents a fundamental departure from traditional distributed systems theory, shifting the paradigm from linear, discrete-state ledgers to continuous, multi-dimensional **Topological Manifolds**. Tailored for high-frequency autonomous agentic coordination, RCO resolves the terminal throughput and latency bottlenecks of legacy blockchain architectures by replacing global linear synchronization with localized geometric coherence.
 
@@ -294,6 +326,8 @@ In the Omega State, the RCO Protocol becomes a mathematically closed, self-gover
 
 ---
 
+---
+
 ## Formal Verification (TLA+)
 
 Mathematical correctness and operational sovereignty are guaranteed through rigorous formal modeling. All critical state-machine transitions, BFT consensus mechanics, and autonomous evolutionary paths have been verified using **TLA+ (Temporal Logic of Actions)** and the **TLC Model Checker**.
@@ -422,6 +456,8 @@ tlc RCO_Shard_Align.tla
 *   **Missing `librco.so`**: If your language binding fails to load the library, ensure you have run the `scripts/setup.sh` script or manually added the `dist/` directory to your `LD_LIBRARY_PATH`.
 *   **AVX-512 Compile Errors**: If building on older hardware, remove `target-cpu=native` from the build flags or explicitly set it to a compatible architecture.
 *   **Julia Dependency Issues**: If `start.jl` fails to load `JSON`, run the `setup.sh` script which automatically provisions the required Julia environment.
+
+---
 
 ---
 

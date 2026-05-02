@@ -1,0 +1,18 @@
+[package]
+name = "rco-sdk-csharp"
+description = "RCO Protocol — C# / .NET SDK (P/Invoke Bindings)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+rco-p14 = { path = "../rco-p14" }
+rco-types = { path = "../rco-types" }
+rco-enclave = { path = "../rco-enclave" }
+rco-quorum = { path = "../rco-quorum" }
+group = "0.13"
+libc = "0.2"

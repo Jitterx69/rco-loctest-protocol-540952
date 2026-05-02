@@ -1,31 +1,61 @@
-//! Recursive Proof Aggregation
+//! Hyper-Finality Proof Generation
 //!
-//! Aggregates multiple shard proofs into a single Global Lasing Proof.
+//! Generates unforgeable proofs of manifold stability linked to hardware identity.
 
 use ark_groth16::{Groth16, ProvingKey, VerifyingKey, Proof};
-use ark_bls12_381::Bls12_381;
+use ark_bls12_381::{Bls12_381, Fr};
 use ark_snark::SNARK;
 use rand::thread_rng;
 use crate::constraints::CoherenceCircuit;
 
-/// Generates a succinct manifold proof.
-pub fn generate_manifold_proof(coherence: u64, threshold: u64) -> Proof<Bls12_381> {
+/// Generates a forensic ZK-proof of manifold stability.
+/// 
+/// # Arguments
+/// * `projection` - The private P14 projection value
+/// * `entropy` - The private entropy coefficient
+/// * `threshold` - The public stability threshold
+/// * `hardware_id` - The public TPM hardware identity
+pub fn generate_forensic_proof(
+    projection: u64, 
+    entropy: u64, 
+    threshold: u64, 
+    hardware_id: u64
+) -> (Proof<Bls12_381>, ProvingKey<Bls12_381>, VerifyingKey<Bls12_381>) {
     let mut rng = thread_rng();
+    
     let circuit = CoherenceCircuit {
-        coherence: Some(coherence.into()),
-        threshold: Some(threshold.into()),
+        projection: Some(Fr::from(projection)),
+        entropy: Some(Fr::from(entropy)),
+        stability_threshold: Some(Fr::from(threshold)),
+        hardware_id: Some(Fr::from(hardware_id)),
     };
 
-    let (pk, _vk) = Groth16::<Bls12_381>::circuit_specific_setup(
-        CoherenceCircuit { coherence: None, threshold: None }, 
+    // In production, the setup should be done once (Trusted Setup).
+    // Here we generate it per proof for demonstration of the "Psi" logic.
+    let (pk, vk) = Groth16::<Bls12_381>::circuit_specific_setup(
+        CoherenceCircuit { 
+            projection: None, 
+            entropy: None, 
+            stability_threshold: None, 
+            hardware_id: None 
+        }, 
         &mut rng
     ).unwrap();
 
-    Groth16::<Bls12_381>::prove(&pk, circuit, &mut rng).unwrap()
+    let proof = Groth16::<Bls12_381>::prove(&pk, circuit, &mut rng).unwrap();
+    (proof, pk, vk)
 }
 
-/// Verifies an aggregated proof.
-pub fn verify_manifold_proof(proof: &Proof<Bls12_381>, vk: &VerifyingKey<Bls12_381>, inputs: &[u64]) -> bool {
-    let ark_inputs: Vec<_> = inputs.iter().map(|&i| ark_bls12_381::Fr::from(i)).collect();
-    Groth16::<Bls12_381>::verify(vk, &ark_inputs, proof).unwrap()
+/// Verifies a forensic manifold proof against public parameters.
+pub fn verify_forensic_proof(
+    proof: &Proof<Bls12_381>, 
+    vk: &VerifyingKey<Bls12_381>, 
+    threshold: u64, 
+    hardware_id: u64
+) -> bool {
+    let public_inputs = vec![
+        Fr::from(threshold),
+        Fr::from(hardware_id),
+    ];
+    Groth16::<Bls12_381>::verify(vk, &public_inputs, proof).unwrap()
 }

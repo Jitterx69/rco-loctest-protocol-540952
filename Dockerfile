@@ -1,19 +1,35 @@
-# RCO Node
-FROM julia:1.10-bookworm
+# --- Stage 1: Build Core ---
+FROM rust:1.77-alpine3.19 AS builder
 
-WORKDIR /app
-RUN mkdir -p /app/dist /app/crates/rco-sdk-julia/julia
+RUN apk add --no-cache musl-dev gcc make perl-dev clang-dev llvm-dev nasm
 
-# Copy files
-COPY dist/librco.so /usr/local/lib/librco.so
-COPY dist/manifest.json /app/dist/
-COPY crates/rco-sdk-julia/julia /app/crates/rco-sdk-julia/julia
-COPY scripts/start.jl /app/scripts/
+WORKDIR /usr/src/rco-protocol
+COPY . .
 
-RUN ldconfig
+# Build the assembly-optimized workspace
+RUN cargo build --release --workspace
 
-# Dependencies
-RUN julia -e 'using Pkg; Pkg.add("JSON")'
+# --- Stage 2: Runtime ---
+FROM alpine:3.19
 
-# Start
-ENTRYPOINT ["julia", "/app/scripts/start.jl"]
+# Add required runtimes (Node.js and OpenJDK for polyglot peak)
+RUN apk add --no-cache \
+    libgcc \
+    libstdc++ \
+    nodejs \
+    npm \
+    openjdk21-jre-headless \
+    tpm2-tss
+
+WORKDIR /opt/rco
+
+# Copy native artifacts
+COPY --from=builder /usr/src/rco-protocol/target/release/*.so /usr/local/lib/
+COPY --from=builder /usr/src/rco-protocol/dist/include /usr/local/include/rco/
+
+# Set up environment for the Sovereign Manifold
+ENV LD_LIBRARY_PATH=/usr/local/lib
+ENV RCO_TPM_DEVICE=/dev/tpmrm0
+
+# Default entrypoint for a sovereign node
+ENTRYPOINT ["/usr/local/lib/librco_core.so"]
