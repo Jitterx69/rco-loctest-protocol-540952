@@ -6,7 +6,7 @@
 ![Rust](https://img.shields.io/badge/rust-1.77%2B-blue)
 ![Node](https://img.shields.io/badge/node-20%2B-green)
 
-## Quick Start: Sovereign Deployment
+## Quick Start
 Deploy a 3-node local manifold with integrated Sentinel auditing using Docker:
 
 ```bash
